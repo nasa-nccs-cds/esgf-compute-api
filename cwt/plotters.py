@@ -91,7 +91,25 @@ class PlotMgr:
             if( axisLen > 1 ):
                 naxes = naxes + 1
         return naxes
-
+    def mpl_histplot(self, dataPath):
+        for k in range(0,30):
+            if( os.path.isfile(dataPath) ):
+                f = cdms2.openDataset(dataPath)
+                for variable in f.variables.values():
+                    try:
+                        first = variable.getAxis(0)
+                        diminfo = str(first).splitlines()
+                        beg = int(filter( str.isdigit, diminfo[3]))
+                        end = int(filter( str.isdigit, diminfo[4]))
+                        x = np.arange(len(variable.getValue()))
+                        tim_arr = list(range(beg, beg+len(variable.getValue())))
+                        plt.bar(x, height=variable.getValue())
+                        plt.xticks(x,tim_arr,rotation='vertical')
+                        plt.show()
+                    except Exception as err:
+                        self.logger.warn(" Error printing data: " + getattr( err, "message", repr(err) ) )
+                    return
+            else: time.sleep(1) 
     def mpl_spaceplot( self, dataPath, timeIndex=0, smooth=True ):
         if dataPath:
             for k in range(0,30):
